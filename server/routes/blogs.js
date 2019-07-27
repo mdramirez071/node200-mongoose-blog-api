@@ -77,24 +77,25 @@ User
 
 router.put('/:id', (req, res) => {
     Blog
-        .findByIdAndUpdate()
-        .then(blogs => {
-            res.status(204).json(blogs);
-        })
-        .catch(function(err) {
-            console.log("error", err )
-        });
+    .findByIdAndUpdate(req.params.id, { $set: req.body })
+    .then(blog => {
+      blog
+      ? res.status(204).json(blog)
+      : res.status(404).json({ 'Error': `No blog with id: ${id} exists to change` });
+    })
+    .catch(err => res.status(500).json({ 'Error': err }));
 });
 
 router.delete('/:id', (req, res) => {
-    Blog
-        .findByIdAndRemove()
-        .then(blogs => {
-            res.status(200).json(blogs);
-        })
-        .catch(function(err) {
-            console.log("error", err )
-        });
+const id = req.params.id;
+Blog
+  .findByIdAndDelete(id)
+  .then(blog => {
+    blog
+    ? res.status(200).json(blog)
+    : res.status(404).json({ 'Error': `No blog with id: ${id} exists to delete` });
+  })
+  .catch(err => res.status(500).json({ 'Error': err }));
 });
 
 module.exports = router;

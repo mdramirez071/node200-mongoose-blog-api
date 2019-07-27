@@ -29,24 +29,13 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-// New higher scope variable
-let dbUser = null;
-// Fetch the user from the database
-User
-    .find(req.body.author)
+// Fetch a fakeUser from the database
+const newUser = new User(req.body);
+console.log(newUser);
+    newUser
+    .save()
     .then(user => {
-        // Store the fetched user in higher scope variable
-        dbUser = user;
-
-        // Create a user
-        const newUser = new User(req.body);
-
-        // Bind the user to it
-        newUser.author = user._id;
-
-        // Save it to the database
-        res.status(201);
-        return newUser.save();
+    res.status(201).json(user);
     })
     .catch(err => {
         res.status(500).send('An internal server occurred could not find server')
@@ -55,9 +44,9 @@ User
 
 router.put('/:id', (req, res) => {
     User
-        .findByIdAndUpdate()
+        .findByIdAndUpdate(req.body._id)
         .then(users => {
-            res.status(200).json(users);
+            res.status(204).json(users);
         })
         .catch(function(err) {
             console.log("error", err )
@@ -66,12 +55,14 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
     User
-        .findByIdAndDelete()
-        .then(users => {
-            res.status(200).json(users);
+        .findByIdAndRemove(req.params.id)
+        .then(user => {
+            user
+            ? res.status(200).json(user)
+            : res.status(404).json('The following user does not exist')
         })
-        .catch(function(err) {
-            console.log("error", err )
+        .catch(err => {
+            res.status(500).send('An internal server error occurred');
         });
 });
 
