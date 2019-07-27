@@ -76,9 +76,8 @@ User
 });
 
 router.put('/:id', (req, res) => {
-    const id = req.params.id;
     Blog
-        .findByIdAndUpdate(id)
+        .findByIdAndUpdate()
         .then(blogs => {
             res.status(204).json(blogs);
         })

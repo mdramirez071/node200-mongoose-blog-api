@@ -14,25 +14,43 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
+    const id = req.params.id;
+    //console.log(id);
     User
-        .save()
-        .then(users => {
-            res.status(200).json(users);
+        .findById(id)
+        .then(user => {
+            user
+            ? res.status(200).json(user)
+            : res.status(404).json(user);
         })
-        .catch(function(err) {
-            console.log("error", err )
+        .catch(err => {
+            res.status(500).send('An internal server occurred could not find server')
         });
 });
 
 router.post('/', (req, res) => {
-    User
-        .find()
-        .then(users => {
-            res.status(200).json(users);
-        })
-        .catch(function(err) {
-            console.log("error", err )
-        });
+// New higher scope variable
+let dbUser = null;
+// Fetch the user from the database
+User
+    .find(req.body.author)
+    .then(user => {
+        // Store the fetched user in higher scope variable
+        dbUser = user;
+
+        // Create a user
+        const newUser = new User(req.body);
+
+        // Bind the user to it
+        newUser.author = user._id;
+
+        // Save it to the database
+        res.status(201);
+        return newUser.save();
+    })
+    .catch(err => {
+        res.status(500).send('An internal server occurred could not find server')
+    });
 });
 
 router.put('/:id', (req, res) => {
